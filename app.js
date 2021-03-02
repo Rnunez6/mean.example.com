@@ -3,9 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
 var mongoose = require('mongoose');
-//~line 7 after mongoose
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var LocalStrategy = require('passport-local').Strategy;
@@ -13,7 +11,7 @@ var passport = require('passport');
 var Users = require('./models/users');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
+var apiAuthRouter = require('./routes/api/auth');
 var apiUsersRouter = require('./routes/api/users');
 
 var app = express();
@@ -71,7 +69,7 @@ app.use(passport.session());
 app.use('/api/users', apiUsersRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
+app.use('/api/auth', apiAuthRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
