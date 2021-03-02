@@ -19,7 +19,7 @@ var app = express();
 var config = require('./config.dev');
 
 //Test the file
-console.log(config);
+// console.log(config);
 
 mongoose.connect(config.mongodb, { useNewUrlParser: true });
 
