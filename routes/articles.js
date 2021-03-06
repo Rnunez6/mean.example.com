@@ -4,7 +4,7 @@ var Articles = require('../models/articles');
 var today = new Date();
 
 router.get('/app', function(req, res, next) {
-  res.render('articles/app', { title: 'Blog Management' });
+  res.render('articles/app', { title: 'Article Management' });
 });
 
 router.get('/', function(req, res, next) {
@@ -14,19 +14,20 @@ router.get('/', function(req, res, next) {
     {
       return handleError(err);
     }
-      return res.render('articles/index', { title: 'Blog' , articles:articles});
+      return res.render('articles/index', { title: 'Articles' , articles:articles});
   });
 });
 
-router.get('/view/:slug', function(req, res, next) {
-  Articles.findOne({slug:req.params.slug},function(err, articles){
+router.get('/:slug', function(req, res, next) {
+  Articles.findOne({'slug':req.params.slug},function(err, articles){
     if(err)
     {
       return handleError(err);
     }
     else{
-      return res.render('articles/view', { title: 'Post' , article:articles});
-    }
+    // return res.json({'success':true, 'article': article});
+    return res.render('articles/view', { title: 'Articles' , article:articles});
+  }
   });
 });
 

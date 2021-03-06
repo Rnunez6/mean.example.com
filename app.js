@@ -134,11 +134,11 @@ app.use(function(req,res,next){
 
 
 
+app.use('/auth', authRouter);
 app.use('/api/users', apiUsersRouter);
 app.use('/api/auth', apiAuthRouter);
 app.use('/api/articles', apiArticlesRouter);
 
-app.use('/auth', authRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/articles', articlesRouter);
