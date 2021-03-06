@@ -6,23 +6,31 @@ var logger = require('morgan');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
-var LocalStrategy = require('passport-local').Strategy;
 var passport = require('passport');
-var Users = require('./models/users');
+var LocalStrategy = require('passport-local').Strategy;
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var Users = require('./models/users');
+var articlesRouter = require('./routes/articles');
+var Articles = require('./models/articles');
+
 var authRouter = require('./routes/auth');
-var apiAuthRouter = require('./routes/api/auth');
 var apiUsersRouter = require('./routes/api/users');
+var apiArticlesRouter = require('./routes/api/articles');
+var apiAuthRouter = require('./routes/api/auth');
 
 var app = express();
-
 var config = require('./config.dev');
+
 
 //Test the file
 // console.log(config);
 
-mongoose.connect(config.mongodb, { useNewUrlParser: true });
+//Connect to MongoDB
+// mongoose.connect(config.mongodb, { useNewUrlParser: true });
+mongoose.connect(config.mongodb, {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -54,6 +62,7 @@ app.use(require('express-session')({
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(Users.createStrategy());
+
 passport.serializeUser(function(user, done){
   done(null,{
     id: user._id,
@@ -68,6 +77,12 @@ passport.deserializeUser(function(user, done){
   done(null, user);
 });
 
+//Working with Session Data
+app.use(function(req,res,next){
+  res.locals.session = req.session;
+  next();
+});
+
 //Session-based access control
 app.use(function(req,res,next){
   //Uncomment the following line to allow access to everything.
@@ -78,7 +93,8 @@ app.use(function(req,res,next){
   //exact matches.
   var whitelist = [
     '/',
-    '/auth'
+    '/auth',
+    '/articles'
   ];
 
   //req.url holds the current URL
@@ -93,7 +109,8 @@ app.use(function(req,res,next){
   //Allow access to dynamic endpoints
   var subs = [
     '/public/',
-    '/api/auth/'
+    '/api/auth/',
+    '/articles'
   ];
 
   //The query string provides a partial URL match beginning
@@ -114,19 +131,23 @@ app.use(function(req,res,next){
   //Redirect the user to the login screen.
   return res.redirect('/auth#login');
 });
-app.use(function(req,res,next){
-  res.locals.session = req.session;
-  next();
-});
+
+
+
 app.use('/api/users', apiUsersRouter);
+app.use('/api/auth', apiAuthRouter);
+app.use('/api/articles', apiArticlesRouter);
+
+app.use('/auth', authRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/api/auth', apiAuthRouter);
+app.use('/articles', articlesRouter);
+
 // catch 404 and forward to error handler
-app.use('/auth', authRouter);
 app.use(function(req, res, next) {
   next(createError(404));
 });
+
 
 // error handler
 app.use(function(err, req, res, next) {

@@ -214,6 +214,7 @@ var usersApp = (function() {
             processRequest('editUser', '/api/users', 'PUT');
           }
       }
+      
       function processRequest(formId, url, method){
         let form = document.getElementById(formId);
         form.addEventListener('submit', function(e){
